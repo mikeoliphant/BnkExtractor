@@ -13,5 +13,30 @@
 		<None Remove="Ww2ogg\Codebooks\*.bin" />
 		<EmbeddedResource Include="Ww2ogg\Codebooks\*.bin" />
 	</ItemGroup>
+	
+	<ItemGroup>
+	  <EmbeddedResource Remove="Ww2ogg\Codebooks\packed_codebooks.bin" />
+	  <EmbeddedResource Remove="Ww2ogg\Codebooks\packed_codebooks_aoTuV_603.bin" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ContentWithTargetPath Include="..\BnkExtractorConsole\Libraries\ogg.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<TargetPath>ogg.dll</TargetPath>
+		</ContentWithTargetPath>
+		<ContentWithTargetPath Include="..\BnkExtractorConsole\Libraries\vorbis.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<TargetPath>vorbis.dll</TargetPath>
+		</ContentWithTargetPath>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Include="Ww2ogg\Codebooks\packed_codebooks.bin">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  <Content Include="Ww2ogg\Codebooks\packed_codebooks_aoTuV_603.bin">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	</ItemGroup>
 
 </Project>
