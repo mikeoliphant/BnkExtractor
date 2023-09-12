@@ -64,16 +64,16 @@ public class Wwise_RIFF_Vorbis
     private Func<BinaryReader, uint> read32Delegate = null;
 
     public Wwise_RIFF_Vorbis(string name, string codebooks_name, bool inline_codebooks, bool full_setup, ForcePacketFormat force_packet_format)
+        : this(File.OpenRead(name), codebooks_name, inline_codebooks, full_setup, force_packet_format)
     {
-        this._file_name = name;
+    }
+
+    public Wwise_RIFF_Vorbis(Stream inputStream, string codebooks_name, bool inline_codebooks, bool full_setup, ForcePacketFormat force_packet_format)
+    {
         this._codebooks_name = codebooks_name;
-        this._infile = new BinaryReader(File.OpenRead(name));
+        this._infile = new BinaryReader(inputStream);
         this._inline_codebooks = inline_codebooks;
         this._full_setup = full_setup;
-        if (_infile == null)
-        {
-            throw new FileOpenException(name);
-        }
 
         _infile.seekg(0, StreamPosition.End);
         _file_size = _infile.tellg();
@@ -464,7 +464,7 @@ public class Wwise_RIFF_Vorbis
             Logger.LogVerbose($"Cue points: {_cue_count}");
     }
 
-    internal void GenerateOgg(BinaryWriter of)
+    public void GenerateOgg(BinaryWriter of)
     {
         BitOggStream os = new BitOggStream(of);
 
