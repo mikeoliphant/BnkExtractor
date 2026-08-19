@@ -15,8 +15,10 @@
 	</ItemGroup>
 	
 	<ItemGroup>
+	  <!-- packed_codebooks_aoTuV_603.bin (the one PsarcDecoder.CodebookPath actually points at)
+	       stays embedded too, so browser-wasm builds can load it via GetManifestResourceStream
+	       instead of the filesystem read the desktop app uses. -->
 	  <EmbeddedResource Remove="Ww2ogg\Codebooks\packed_codebooks.bin" />
-	  <EmbeddedResource Remove="Ww2ogg\Codebooks\packed_codebooks_aoTuV_603.bin" />
 	</ItemGroup>
 
 	<ItemGroup>
