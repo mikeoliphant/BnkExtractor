@@ -1,6 +1,9 @@
-﻿using BnkExtractor.Ww2ogg.Exceptions;
+﻿using System.IO;
+using System.Reflection;
+using System.Reflection.PortableExecutable;
+using System.Runtime.InteropServices;
+using BnkExtractor.Ww2ogg.Exceptions;
 using BnkExtractor.Ww2ogg.Extensions;
-using System.IO;
 
 namespace BnkExtractor.Ww2ogg;
 
@@ -10,52 +13,58 @@ public class CodebookLibrary
     private int[] codebook_offsets;
     private int codebook_count;
 
-    public CodebookLibrary(string filename)
+    public static CodebookLibrary FromFile(string filename)
     {
-        BinaryReader @is = new BinaryReader(File.OpenRead(filename));
+        if (!File.Exists(filename))
+            throw new FileNotFoundException(filename);
 
-        if (@is == null)
+        using (Stream stream = File.OpenRead(filename))
         {
-            throw new FileOpenException(filename);
+            return new CodebookLibrary(stream);
         }
-
-        LoadFrom(@is);
     }
 
-    // Same parsing as CodebookLibrary(string), for callers that can't do a filesystem read
-    // (e.g. browser-wasm) and have the codebook bytes already in memory instead.
-    public CodebookLibrary(byte[] data)
+    public static CodebookLibrary FromEmbeddedResource(string resourceName)
     {
-        using BinaryReader @is = new BinaryReader(new MemoryStream(data));
+        Assembly assembly = typeof(CodebookLibrary).Assembly;
 
-        LoadFrom(@is);
+        using (Stream resourceStream = assembly.GetManifestResourceStream(string.Join(".", "BnkExtractor", "Ww2ogg", "Codebooks", resourceName)))
+        {
+            if (resourceStream == null)
+                throw new FileNotFoundException(resourceName);
+
+            return new CodebookLibrary(resourceStream);
+        }
     }
 
-    private void LoadFrom(BinaryReader @is)
+    public CodebookLibrary(Stream libraryStream)
     {
-        this.codebook_data = null;
-        this.codebook_offsets = null;
-        this.codebook_count = 0;
-
-        @is.seekg(0, StreamPosition.End);
-        int file_size = @is.tellg();
-
-        @is.seekg(file_size - 4, StreamPosition.Beginning);
-        int offset_offset = (int)EndianReadWriteMethods.Read32LE(@is);
-        codebook_count = (file_size - offset_offset) / 4;
-
-        codebook_data = new byte[offset_offset];
-        codebook_offsets = new int[codebook_count];
-
-        @is.seekg(0, StreamPosition.Beginning);
-        for (int i = 0; i < offset_offset; i++)
+        using (BinaryReader reader = new BinaryReader(libraryStream))
         {
-            codebook_data[i] = @is.ReadByte();
-        }
+            this.codebook_data = null;
+            this.codebook_offsets = null;
+            this.codebook_count = 0;
 
-        for (int i = 0; i < codebook_count; i++)
-        {
-            codebook_offsets[i] = (int)EndianReadWriteMethods.Read32LE(@is);
+            reader.seekg(0, StreamPosition.End);
+            int file_size = reader.tellg();
+
+            reader.seekg(file_size - 4, StreamPosition.Beginning);
+            int offset_offset = (int)EndianReadWriteMethods.Read32LE(reader);
+            codebook_count = (file_size - offset_offset) / 4;
+
+            codebook_data = new byte[offset_offset];
+            codebook_offsets = new int[codebook_count];
+
+            reader.seekg(0, StreamPosition.Beginning);
+            for (int i = 0; i < offset_offset; i++)
+            {
+                codebook_data[i] = reader.ReadByte();
+            }
+
+            for (int i = 0; i < codebook_count; i++)
+            {
+                codebook_offsets[i] = (int)EndianReadWriteMethods.Read32LE(reader);
+            }
         }
     }
 

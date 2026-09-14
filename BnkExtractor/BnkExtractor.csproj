@@ -10,18 +10,6 @@
 	</ItemGroup>
 	
 	<ItemGroup>
-		<None Remove="Ww2ogg\Codebooks\*.bin" />
-		<EmbeddedResource Include="Ww2ogg\Codebooks\*.bin" />
-	</ItemGroup>
-	
-	<ItemGroup>
-	  <!-- packed_codebooks_aoTuV_603.bin (the one PsarcDecoder.CodebookPath actually points at)
-	       stays embedded too, so browser-wasm builds can load it via GetManifestResourceStream
-	       instead of the filesystem read the desktop app uses. -->
-	  <EmbeddedResource Remove="Ww2ogg\Codebooks\packed_codebooks.bin" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<ContentWithTargetPath Include="..\BnkExtractorConsole\Libraries\ogg.dll">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 			<TargetPath>ogg.dll</TargetPath>
@@ -31,14 +19,14 @@
 			<TargetPath>vorbis.dll</TargetPath>
 		</ContentWithTargetPath>
 	</ItemGroup>
-
+	
 	<ItemGroup>
-	  <Content Include="Ww2ogg\Codebooks\packed_codebooks.bin">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </Content>
-	  <Content Include="Ww2ogg\Codebooks\packed_codebooks_aoTuV_603.bin">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </Content>
+	  <EmbeddedResource Include="Ww2ogg\Codebooks\packed_codebooks.bin">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </EmbeddedResource>
+	  <EmbeddedResource Include="Ww2ogg\Codebooks\packed_codebooks_aoTuV_603.bin">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </EmbeddedResource>
 	</ItemGroup>
 
 </Project>

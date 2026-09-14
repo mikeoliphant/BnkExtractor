@@ -9,7 +9,6 @@ public class Wwise_RIFF_Vorbis
 {
     private string _file_name = "";
     private string _codebooks_name = "";
-    private byte[] _codebook_data = null;
     private BinaryReader _infile;
     private int _file_size = -1;
 
@@ -67,15 +66,6 @@ public class Wwise_RIFF_Vorbis
     public Wwise_RIFF_Vorbis(string name, string codebooks_name, bool inline_codebooks, bool full_setup, ForcePacketFormat force_packet_format)
         : this(File.OpenRead(name), codebooks_name, inline_codebooks, full_setup, force_packet_format)
     {
-    }
-
-    // Same as the (Stream, string codebooks_name, ...) constructor, for callers that can't
-    // do a filesystem read for the codebook file (e.g. browser-wasm) and have the codebook
-    // bytes already in memory instead (see CodebookLibrary(byte[])).
-    public Wwise_RIFF_Vorbis(Stream inputStream, byte[] codebookData, bool inline_codebooks, bool full_setup, ForcePacketFormat force_packet_format)
-        : this(inputStream, string.Empty, inline_codebooks, full_setup, force_packet_format)
-    {
-        _codebook_data = codebookData;
     }
 
     public Wwise_RIFF_Vorbis(Stream inputStream, string codebooks_name, bool inline_codebooks, bool full_setup, ForcePacketFormat force_packet_format)
@@ -799,11 +789,7 @@ public class Wwise_RIFF_Vorbis
             }
             else
             {
-                /* external codebooks */
-
-                CodebookLibrary cbl = _codebook_data != null
-                    ? new CodebookLibrary(_codebook_data)
-                    : new CodebookLibrary(_codebooks_name);
+                CodebookLibrary cbl = CodebookLibrary.FromEmbeddedResource(_codebooks_name);
 
                 for (uint i = 0; i < codebook_count; i++)
                 {
