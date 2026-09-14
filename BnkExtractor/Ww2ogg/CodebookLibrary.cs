@@ -12,15 +12,30 @@ public class CodebookLibrary
 
     public CodebookLibrary(string filename)
     {
-        this.codebook_data = null;
-        this.codebook_offsets = null;
-        this.codebook_count = 0;
         BinaryReader @is = new BinaryReader(File.OpenRead(filename));
 
         if (@is == null)
         {
             throw new FileOpenException(filename);
         }
+
+        LoadFrom(@is);
+    }
+
+    // Same parsing as CodebookLibrary(string), for callers that can't do a filesystem read
+    // (e.g. browser-wasm) and have the codebook bytes already in memory instead.
+    public CodebookLibrary(byte[] data)
+    {
+        using BinaryReader @is = new BinaryReader(new MemoryStream(data));
+
+        LoadFrom(@is);
+    }
+
+    private void LoadFrom(BinaryReader @is)
+    {
+        this.codebook_data = null;
+        this.codebook_offsets = null;
+        this.codebook_count = 0;
 
         @is.seekg(0, StreamPosition.End);
         int file_size = @is.tellg();
